@@ -1,0 +1,56 @@
+version: '3.7'
+
+services:
+  worker:
+    image: backend_django
+    restart: always
+    command: celery -A settings worker -l info
+    depends_on:
+      - backend
+      - rabbitmq
+    env_file:
+      - .env
+
+
+  backend:
+    image: backend_django
+    build:
+      context: .
+    restart: always
+    entrypoint: /code/entrypoint.sh
+    command: python3 manage.py runserver 0.0.0.0:${BACKEND_PORT}
+    expose:
+      - ${BACKEND_PORT}
+    volumes:
+      - static_volume:/code/static
+      - media_volume:/code/media
+    depends_on:
+      - db
+      - rabbitmq
+    ports:
+      - ${BACKEND_PORT}:${BACKEND_PORT}
+    env_file:
+      - .env
+
+  db:
+    image: postgres:13-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    restart: "on-failure"
+    expose:
+      - ${PGPORT}
+    env_file:
+      - .env
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    expose:
+      - ${RABBITMQ_PORT}
+
+  redis:
+    image: redis:latest
+
+volumes:
+  postgres_data:
+  static_volume:
+  media_volume:

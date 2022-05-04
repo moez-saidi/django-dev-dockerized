@@ -5,6 +5,8 @@ services:
     image: backend_django
     restart: always
     command: celery -A settings worker -l info
+    volumes:
+      - ${PWD}:/code
     depends_on:
       - backend
       - rabbitmq
@@ -24,6 +26,7 @@ services:
     volumes:
       - static_volume:/code/static
       - media_volume:/code/media
+      - ${PWD}:/code
     depends_on:
       - db
       - rabbitmq

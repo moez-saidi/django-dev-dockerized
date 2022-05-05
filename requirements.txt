@@ -1,0 +1,6 @@
+pre-commit==2.18.1
+Django==3.2.13
+psycopg2-binary==2.9.3
+python-dotenv==0.20.0
+celery==5.2.6
+django-celery-results==2.3.1

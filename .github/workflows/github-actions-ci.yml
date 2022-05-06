@@ -1,0 +1,16 @@
+name: CI
+on: [push]
+jobs:
+  runMultipleCommands:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.8', '3.9']
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-python@v3
+      with:
+        python-version: ${{ matrix.python-version }}
+    - run: |
+        pip install -r requirements.txt
+        pre-commit run --all-files

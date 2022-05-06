@@ -1,11 +1,11 @@
 name: CI
 on: [push]
 jobs:
-  runMultipleCommands:
+  Check-Code-Style:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.8', '3.9']
+        python-version: ['3.8']
     steps:
     - uses: actions/checkout@v3
     - uses: actions/setup-python@v3
@@ -14,3 +14,47 @@ jobs:
     - run: |
         pip install -r requirements.txt
         pre-commit run --all-files
+
+  Check-Code-Unittests:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.8']
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-python@v3
+      with:
+        python-version: ${{ matrix.python-version }}
+    - run: |
+        echo "# Backend settings" >> .env
+        echo "DEBUG=True" >> .env
+        echo "BACKEND_HOSTNAME=backend" >> .env
+        echo "BACKEND_PORT=8989" >> .env
+        echo "SECRET_KEY=some_random_secret" >> .env
+        echo "DJANGO_SUPERUSER_PASSWORD=i'masuperuserA12" >> .env
+        echo "DJANGO_SUPERUSER_USERNAME=admin" >> .env
+        echo "DJANGO_SUPERUSER_EMAIL=admin@gmail.com" >> .env
+
+        echo "# DB settings" >> .env
+        echo "POSTGRES_HOST=db" >> .env
+        echo "POSTGRES_NAME=db" >> .env
+        echo "POSTGRES_USER=user" >> .env
+        echo "POSTGRES_PASSWORD=postpassAWS59" >> .env
+        echo "POSTGRES_DB=db" >> .env
+        echo "PGPORT=5433" >> .env
+
+        echo "# RabbitMQ" >> .env
+        echo "RABBITMQ_PORT=5673" >> .env
+
+        echo "# Celery" >> .env
+        echo "CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:" >> .env
+
+        docker-compose -p dev up --build
+
+        docker exec dev_backend_1 python manage.py test
+
+        docker-compose -p dev down -v
+
+
+
+        

@@ -41,17 +41,17 @@ jobs:
     - run:    echo "POSTGRES_DB=db" >> .env
     - run:    echo "PGPORT=5433" >> .env
 
-        echo "# RabbitMQ" >> .env
-        echo "RABBITMQ_PORT=5673" >> .env
+    - run:    echo "# RabbitMQ" >> .env
+    - run:    echo "RABBITMQ_PORT=5673" >> .env
 
-        echo "# Celery" >> .env
-        echo "CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:" >> .env
+    - run:    echo "# Celery" >> .env
+    - run:    echo "CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:" >> .env
 
-        docker-compose -p dev up --build
+    - run:    docker-compose -p dev up --build
 
-        docker exec dev_backend_1 python manage.py test
+    - run:    docker exec dev_backend_1 python manage.py test
 
-        docker-compose -p dev down -v
+    - run:    docker-compose -p dev down -v
 
 
 

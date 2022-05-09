@@ -47,7 +47,7 @@ jobs:
     - run:    echo "# Celery" >> .env
     - run:    echo "CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:" >> .env
 
-    - run:    docker-compose -p dev up --build
+    - run:    docker-compose -p dev up --build -d
 
     - run:    docker exec dev_backend_1 python manage.py test
 

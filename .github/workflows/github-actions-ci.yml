@@ -1,0 +1,58 @@
+name: CI
+on: [push]
+jobs:
+  Check-Code-Style:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.8']
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-python@v3
+      with:
+        python-version: ${{ matrix.python-version }}
+    - run: pip install -r requirements.txt
+    - run: pre-commit run --all-files
+        
+  Check-Code-Unittests:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.8']
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-python@v3
+      with:
+        python-version: ${{ matrix.python-version }}
+    - run:    echo "# Backend settings" >> .env
+    - run:    echo "DEBUG=True" >> .env
+    - run:    echo "BACKEND_HOSTNAME=backend" >> .env
+    - run:    echo "BACKEND_PORT=8989" >> .env
+    - run:    echo "SECRET_KEY=some_random_secret" >> .env
+    - run:    echo "DJANGO_SUPERUSER_PASSWORD=i'masuperuserA12" >> .env
+    - run:    echo "DJANGO_SUPERUSER_USERNAME=admin" >> .env
+    - run:    echo "DJANGO_SUPERUSER_EMAIL=admin@gmail.com" >> .env
+
+    - run:    echo "# DB settings" >> .env
+    - run:    echo "POSTGRES_HOST=db" >> .env
+    - run:    echo "POSTGRES_NAME=db" >> .env
+    - run:    echo "POSTGRES_USER=user" >> .env
+    - run:    echo "POSTGRES_PASSWORD=postpassAWS59" >> .env
+    - run:    echo "POSTGRES_DB=db" >> .env
+    - run:    echo "PGPORT=5433" >> .env
+
+    - run:    echo "# RabbitMQ" >> .env
+    - run:    echo "RABBITMQ_PORT=5673" >> .env
+
+    - run:    echo "# Celery" >> .env
+    - run:    echo "CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:" >> .env
+
+    - run:    docker-compose -p dev up --build -d
+
+    - run:    docker exec dev_backend_1 python manage.py test
+
+    - run:    docker-compose -p dev down -v
+
+
+
+        
